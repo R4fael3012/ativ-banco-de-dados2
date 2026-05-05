@@ -1,29 +1,5 @@
 --database: ./db.sqlite
 
--- Requisitos Funcionais
--- Regras de Negócio
--- Requisitos Não Funcionais
-
-DROP SCHEMA IF EXISTS oficina CASCADE;
-CREATE SCHEMA oficina;
-SET search_path TO oficina, public;
-
-
-CREATE DOMAIN dm_cpf AS VARCHAR(11) 
-    CHECK (VALUE ~ '^\d{11}$');
-
-CREATE DOMAIN dm_cnpj AS VARCHAR(14) 
-    CHECK (VALUE ~ '^\d{14}$');
-
-CREATE DOMAIN dm_placa AS VARCHAR(7) 
-    CHECK (VALUE ~ '^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$'); 
-
-CREATE DOMAIN dm_email AS VARCHAR(255) 
-    CHECK (VALUE ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$');
-
-CREATE DOMAIN dm_telefone AS VARCHAR(15);
-
-
 CREATE TABLE cliente (
     id_cliente SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
