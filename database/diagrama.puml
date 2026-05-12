@@ -1,0 +1,123 @@
+/' Modelo Lógico '/
+
+@startuml diagrama
+!theme plain
+skinparam linetype ortho
+
+entity "cliente" {
+    * id_cliente : SERIAL <<PK>>
+    --
+    nome : VARCHAR(100)
+    email : dm_email
+    telefone : dm_telefone
+    cpf : dm_cpf
+    cnpj : dm_cnpj
+    tipo_pessoa : CHAR(2)
+}
+
+entity "veiculo" {
+    * id_veiculo : SERIAL <<PK>>
+    --
+    id_cliente : INTEGER <<FK>>
+    placa : dm_placa
+    marca : VARCHAR(50)
+    modelo : VARCHAR(50)
+    ano_fabricacao : INTEGER
+    cor : VARCHAR(30)
+}
+
+entity "funcionario" {
+    * id_funcionario : SERIAL <<PK>>
+    --
+    nome : VARCHAR(100)
+    cargo : VARCHAR(50)
+    especialidade : VARCHAR(50)
+    salario : NUMERIC(12,2)
+}
+
+entity "tipo_servico" {
+    * id_tipo_servico : SERIAL <<PK>>
+    --
+    descricao : VARCHAR(100)
+    preco_base : NUMERIC(12,2)
+    tempo_estimado_minutos : INTEGER
+}
+
+entity "peca" {
+    * id_peca : SERIAL <<PK>>
+    --
+    nome : VARCHAR(100)
+    fornecedor : VARCHAR(100)
+    quantidade_atual : INTEGER
+    quantidade_minima : INTEGER
+    preco_unitario : NUMERIC(12,2)
+}
+
+entity "agendamento" {
+    * id_agendamento : SERIAL <<PK>>
+    --
+    id_veiculo : INTEGER <<FK>>
+    data_abertura : TIMESTAMPTZ
+    data_conclusao : TIMESTAMPTZ
+    status : VARCHAR(20)
+    km_entrada : INTEGER
+    km_saida : INTEGER
+    total_mao_de_obra : NUMERIC(12,2)
+    total_pecas : NUMERIC(12,2)
+}
+
+entity "item_servico" {
+    * id_item_servico : SERIAL <<PK>>
+    --
+    id_agendamento : INTEGER <<FK>>
+    id_tipo_servico : INTEGER <<FK>>
+    id_funcionario : INTEGER <<FK>>
+    quantidade : INTEGER
+    preco_unitario : NUMERIC(12,2)
+    desconto_percentual : NUMERIC(5,2)
+    total_item : NUMERIC(12,2) <<Generated>>
+}
+
+entity "item_peca" {
+    * id_item_peca : SERIAL <<PK>>
+    --
+    id_agendamento : INTEGER <<FK>>
+    id_peca : INTEGER <<FK>>
+    quantidade : INTEGER
+    preco_unitario : NUMERIC(12,2)
+    desconto_percentual : NUMERIC(5,2)
+    total_item : NUMERIC(12,2) <<Generated>>
+}
+
+entity "pagamento" {
+    * id_pagamento : SERIAL <<PK>>
+    --
+    id_agendamento : INTEGER <<FK>>
+    forma_pagamento : VARCHAR(50)
+    valor_pago : NUMERIC(12,2)
+    data_pagamento : TIMESTAMPTZ
+    parcelas : INTEGER
+}
+
+entity "avaliacao" {
+    * id_avaliacao : SERIAL <<PK>>
+    --
+    id_agendamento : INTEGER <<FK, UNIQUE>>
+    nota : INTEGER
+    comentario : TEXT
+    data_avaliacao : DATE
+}
+
+' Relacionamentos
+cliente ||--o{ veiculo : "possui"
+veiculo ||--o{ agendamento : "tem"
+agendamento ||--o{ item_servico : "contém"
+agendamento ||--o{ item_peca : "consome"
+agendamento ||--o{ pagamento : "gera"
+agendamento ||--|| avaliacao : "recebe"
+
+tipo_servico ||--o{ item_servico : "referencia"
+funcionario ||--o{ item_servico : "executa"
+peca ||--o{ item_peca : "fornece"
+
+@enduml
