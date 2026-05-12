@@ -133,6 +133,7 @@ SELECT
     CASE WHEN i % 2 = 0 THEN 'Motores' ELSE 'Suspensão' END,
     round(2500 + (random() * 5000),2)
 FROM s;
+
 WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i < 25)
 INSERT INTO tipo_servico (descricao, preco_base, tempo_estimado_minutos)
 SELECT 
@@ -140,6 +141,7 @@ SELECT
     round(100 + (random() * 900),2),
     30 + (i * 10)
 FROM s;
+
 WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i < 45)
 INSERT INTO peca (nome, fornecedor, quantidade_atual, quantidade_minima, preco_unitario)
 SELECT 
@@ -149,6 +151,7 @@ SELECT
     15,
     round(50 + (random() * 450),2)
 FROM s;
+
 WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i < 210)
 INSERT INTO cliente (nome, email, telefone, tipo_pessoa, cpf, cnpj)
 SELECT 
@@ -159,6 +162,7 @@ SELECT
     CASE WHEN i % 2 = 0 THEN printf('%011d', i) ELSE NULL END,
     CASE WHEN i % 2 <> 0 THEN printf('%014d', i) ELSE NULL END
 FROM s;
+
 WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i < 520)
 INSERT INTO veiculo (id_cliente, placa, marca, modelo, ano_fabricacao, cor)
 SELECT 
@@ -169,6 +173,7 @@ SELECT
     2010 + (i % 15),
     'Cor ' || (i % 5)
 FROM s;
+
 WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i < 3600)
 INSERT INTO agendamento (id_veiculo, data_abertura, data_conclusao, status, km_entrada, km_saida)
 SELECT 
@@ -188,6 +193,7 @@ SELECT
     CAST((random() * 50000) AS INTEGER),
     CASE WHEN i <= 3200 THEN CAST((random() * 50000 + 100) AS INTEGER) ELSE NULL END
 FROM s;
+
 WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i < 7200)
 INSERT INTO item_servico (id_agendamento, id_tipo_servico, id_funcionario, quantidade, preco_unitario)
 SELECT 
@@ -197,6 +203,7 @@ SELECT
     1 + CAST((random()*2) AS INTEGER),
     round(50 + (random()*100),2)
 FROM s;
+
 WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i < 5100)
 INSERT INTO item_peca (id_agendamento, id_peca, quantidade, preco_unitario)
 SELECT 
@@ -205,6 +212,7 @@ SELECT
     CAST((random() * 3 + 1) AS INTEGER),
     round(10 + (random()*50),2)
 FROM s;
+
 WITH RECURSIVE s2(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s2 WHERE i < 5100)
 INSERT INTO item_peca (id_agendamento, id_peca, quantidade, preco_unitario)
 SELECT 
@@ -326,3 +334,12 @@ JOIN avaliacao av ON a.id_agendamento = av.id_agendamento
 GROUP BY f.id_funcionario, f.nome
 HAVING COUNT(av.id_avaliacao) >= 5
 ORDER BY nota_media DESC;
+
+SELECT 
+    forma_pagamento,
+    COUNT(*) AS qtd_transacoes,
+    SUM(valor_pago) AS valor_total,
+    ROUND((SUM(valor_pago) * 100.0 / SUM(SUM(valor_pago)) OVER()), 2) AS percentual_valor
+FROM pagamento
+GROUP BY forma_pagamento
+ORDER BY valor_total DESC;
